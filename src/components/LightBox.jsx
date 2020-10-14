@@ -1,7 +1,7 @@
 import React from 'react';
 import { Fragment } from 'react';
 import '../css/LightBox.css';
-import { Card } from 'react-bootstrap';
+import { Card, Button } from 'react-bootstrap';
 
 const LightBox = (props) => {
   if (!props.selectedGif.images) return null;
@@ -12,9 +12,22 @@ const LightBox = (props) => {
   return (
     <Fragment>
       <div className={styles} onClick={props.toggleLightBox}>
+        <Button
+          lbcontrol="true"
+          className="lbControl"
+          onClick={props.onPrev}
+          size="lg"
+        >
+          {'<'}
+        </Button>
         <Card>
-          {/* <Card.Img variant="top" src={gif.images['480w_still'].url} /> */}
-          <video lbcontrol="true" autoPlay loop muted>
+          <video
+            key={props.selectedGif.id}
+            lbcontrol="true"
+            autoPlay
+            loop
+            muted
+          >
             <source
               //   src={
               //     'https://media3.giphy.com/media/Ju7l5y9osyymQ/giphy.mp4?cid=9adecad76qh6wkigywkkpbtzbv9dapbi5hmr880hs1zgqc68&rid=giphy.mp4'
@@ -26,6 +39,14 @@ const LightBox = (props) => {
             ></source>
           </video>
         </Card>
+        <Button
+          lbcontrol="true"
+          className="lbControl"
+          onClick={props.onNext}
+          size="lg"
+        >
+          {'>'}
+        </Button>
       </div>
     </Fragment>
   );

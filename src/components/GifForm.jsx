@@ -24,15 +24,20 @@ class GifForm extends Component {
       gifs: [],
       offset: 0,
       lbActive: false,
+      movingThumbnails: false,
       selectedGif: '',
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.toggleLightBox = this.toggleLightBox.bind(this);
+    this.toggleMovingThumbnails = this.toggleMovingThumbnails.bind(this);
+    this.onPrev = this.onPrev.bind(this);
+    this.onNext = this.onNext.bind(this);
   }
 
   async handleSubmit(e) {
+    const { gif, offset } = this.state;
     e.preventDefault();
     let res = '';
     await axios
@@ -41,14 +46,14 @@ class GifForm extends Component {
           '?api_key=' +
           GIPHY_API_KEY +
           '&q=' +
-          this.state.gif +
+          gif +
           '&offset=' +
-          this.state.offset +
+          offset +
           GIPHY_SEARCH_DEFAULT_OPTIONS
       )
       .then(function (response) {
         // handle success
-        // console.log(response.data.data);
+        console.log(response);
         res = response.data.data;
       })
       .catch(function (error) {
@@ -66,16 +71,36 @@ class GifForm extends Component {
     this.setState({ [event.target.name]: event.target.value });
   }
 
+  toggleMovingThumbnails(event) {
+    this.setState({ movingThumbnails: !this.state.movingThumbnails });
+  }
+
+  onNext(event) {
+    const { gifs, selectedGif } = this.state;
+    let index = gifs.findIndex((gif) => gif.id === selectedGif.id);
+    if (index < 24) index++;
+    this.setState({ selectedGif: gifs[index] });
+  }
+
+  onPrev(event) {
+    const { gifs, selectedGif } = this.state;
+    let index = gifs.findIndex((gif) => gif.id === selectedGif.id);
+    if (index > 0) index--;
+    this.setState({ selectedGif: gifs[index] });
+  }
+
   toggleLightBox(event) {
+    const { gifs, lbActive } = this.state;
     if (event.target.getAttribute('lbcontrol')) return;
-    let selected = this.state.gifs.find((gif) => gif.id === event.target.id);
+    let selected = gifs.find((gif) => gif.id === event.target.id);
     this.setState({
-      lbActive: !this.state.lbActive,
+      lbActive: !lbActive,
       selectedGif: selected ? selected : {},
     });
   }
 
   render() {
+    const { gifs, gif, movingThumbnails, lbActive, selectedGif } = this.state;
     return (
       <Fragment>
         <Container fluid>
@@ -84,10 +109,18 @@ class GifForm extends Component {
             <Row>
               <Form onSubmit={this.handleSubmit}>
                 <Form.Group controlId="gif">
-                  <Form.Label>Watch it move</Form.Label>
+                  <Form.Check
+                    key={1}
+                    type="switch"
+                    id="custom-switch"
+                    name="movingThumbnails"
+                    label="Watch it move"
+                    onChange={this.toggleMovingThumbnails}
+                    value={movingThumbnails}
+                  />
                   <Form.Control
                     onChange={this.handleChange}
-                    value={this.state.gif}
+                    value={gif}
                     type="text"
                     placeholder="gif"
                     name="gif"
@@ -100,28 +133,39 @@ class GifForm extends Component {
               </Form>
             </Row>
           </Col>
-
+          <hr />
           <CardColumns>
-            {this.state.gifs.map((gif) => {
-              return (
-                <Card key={gif.id} onClick={this.toggleLightBox}>
+            {gifs.map((gif) => {
+              let thumbnail = '';
+              if (movingThumbnails) {
+                thumbnail = (
+                  <video id={gif.id} autoPlay loop muted>
+                    <source src={gif.images.original.mp4}></source>
+                  </video>
+                );
+              } else {
+                thumbnail = (
                   <Card.Img
                     id={gif.id}
                     variant="top"
                     src={gif.images['480w_still'].url}
                   />
-                  <video id={gif.id} autoPlay loop muted>
-                    <source src={gif.images.original.mp4}></source>
-                  </video>
+                );
+              }
+              return (
+                <Card key={gif.id} onClick={this.toggleLightBox}>
+                  {thumbnail}
                 </Card>
               );
             })}
           </CardColumns>
 
           <LightBox
-            isActive={this.state.lbActive}
-            selectedGif={this.state.selectedGif}
+            isActive={lbActive}
+            selectedGif={selectedGif}
             toggleLightBox={this.toggleLightBox}
+            onNext={this.onNext}
+            onPrev={this.onPrev}
           />
         </Container>
       </Fragment>
