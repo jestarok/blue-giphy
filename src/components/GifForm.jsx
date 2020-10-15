@@ -35,8 +35,12 @@ class GifForm extends Component {
     this.toggleMovingThumbnails = this.toggleMovingThumbnails.bind(this);
     this.onPrev = this.onPrev.bind(this);
     this.onNext = this.onNext.bind(this);
+    this.escFunction = this.escFunction.bind(this);
   }
 
+  escFunction(event) {
+    console.log(event.key);
+  }
   async handleSubmit(e) {
     const { gif, offset } = this.state;
     e.preventDefault();
@@ -139,7 +143,7 @@ class GifForm extends Component {
   onNext() {
     const { gifs, selectedGif } = this.state;
     let index = gifs.findIndex((gif) => gif.id === selectedGif.id);
-    if (index < 24) index++;
+    if (index < gifs.length - 1) index++;
     this.setState({ selectedGif: gifs[index] });
   }
 
@@ -257,7 +261,11 @@ class GifForm extends Component {
                 }
                 return (
                   <Col key={index} md={4} className="align-middle">
-                    <Card key={gif.id} onClick={this.toggleLightBox}>
+                    <Card
+                      key={gif.id}
+                      style={{ border: 'none' }}
+                      onClick={this.toggleLightBox}
+                    >
                       {thumbnail}
                     </Card>
                   </Col>

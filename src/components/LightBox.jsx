@@ -4,45 +4,56 @@ import '../css/LightBox.css';
 import { Card, Button } from 'react-bootstrap';
 
 const LightBox = (props) => {
-  if (!props.selectedGif.images) return null;
-  console.log('from lb ' + props.isActive);
-  console.log(props.selectedGif.images);
+  const { onNext, onPrev, toggleLightBox, selectedGif, isActive } = props;
+  React.useEffect(() => {
+    const handleKeyDown = (event) => {
+      console.log(event.key);
+      switch (event.key) {
+        case 'ArrowLeft':
+          console.log('prev');
+          onPrev();
+          break;
+        case 'ArrowRight':
+          onNext();
+          break;
+        case 'Escape':
+          toggleLightBox(event);
+          break;
+        default:
+          break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+
+    // cleanup this component
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onNext, onPrev, toggleLightBox]);
+
+  if (!selectedGif.images) return null;
   let styles = 'LightBox ';
-  styles += props.isActive ? 'active' : '';
+  styles += isActive ? 'active' : '';
   return (
     <Fragment>
-      <div className={styles} onClick={props.toggleLightBox}>
+      <div className={styles} onClick={toggleLightBox}>
         <Button
           lbcontrol="true"
           className="lbControl"
-          onClick={props.onPrev}
+          onClick={onPrev}
           size="lg"
         >
           {'<'}
         </Button>
         <Card>
-          <video
-            key={props.selectedGif.id}
-            lbcontrol="true"
-            autoPlay
-            loop
-            muted
-          >
-            <source
-              //   src={
-              //     'https://media3.giphy.com/media/Ju7l5y9osyymQ/giphy.mp4?cid=9adecad76qh6wkigywkkpbtzbv9dapbi5hmr880hs1zgqc68&rid=giphy.mp4'
-              //   }
-              //   src={
-              //     'https://media4.giphy.com/media/kiJEGxbplHfT5zkCDJ/giphy.mp4?cid=9adecad7gpu6w50pm10i56xg4xzp56lepo38j4foi24ol69c&rid=giphy.mp4'
-              //   }
-              src={props.selectedGif.images.original.mp4}
-            ></source>
+          <video key={selectedGif.id} lbcontrol="true" autoPlay loop muted>
+            <source src={selectedGif.images.original.mp4}></source>
           </video>
         </Card>
         <Button
           lbcontrol="true"
           className="lbControl"
-          onClick={props.onNext}
+          onClick={onNext}
           size="lg"
         >
           {'>'}
