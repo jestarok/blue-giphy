@@ -1,5 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { Form, Button, Row, Col, Container, Card } from 'react-bootstrap';
+import Masonry from 'react-masonry-component';
 import {
   GIPHY_API_KEY,
   GIPHY_SEARCH_URL,
@@ -220,33 +221,49 @@ class GifForm extends Component {
                 </p>
               </Col>
             }
-            className="row"
+            // className="row"
           >
-            {gifs.map((gif) => {
-              let thumbnail = '';
-              if (movingThumbnails) {
-                thumbnail = (
-                  <video id={gif.id} autoPlay loop muted>
-                    <source src={gif.images.original.mp4}></source>
-                  </video>
+            <Masonry
+              className={'my-gallery-class'} // default ''
+              elementType={'div'} // default 'div'
+              options={{}} // default {}
+              disableImagesLoaded={false} // default false
+              updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
+              imagesLoadedOptions={{}} // default {}
+            >
+              {gifs.map((gif, index) => {
+                let thumbnail = '';
+                if (movingThumbnails) {
+                  thumbnail = (
+                    <video
+                      className="thumbnail"
+                      id={gif.id}
+                      autoPlay
+                      loop
+                      muted
+                    >
+                      <source src={gif.images.original.mp4}></source>
+                    </video>
+                  );
+                } else {
+                  thumbnail = (
+                    <Card.Img
+                      id={gif.id}
+                      className="thumbnail"
+                      variant="top"
+                      src={gif.images['480w_still'].url}
+                    />
+                  );
+                }
+                return (
+                  <Col key={index} md={4} className="align-middle">
+                    <Card key={gif.id} onClick={this.toggleLightBox}>
+                      {thumbnail}
+                    </Card>
+                  </Col>
                 );
-              } else {
-                thumbnail = (
-                  <Card.Img
-                    id={gif.id}
-                    variant="top"
-                    src={gif.images['480w_still'].url}
-                  />
-                );
-              }
-              return (
-                <Col key={gif.id} md={4}>
-                  <Card key={gif.id} onClick={this.toggleLightBox}>
-                    {thumbnail}
-                  </Card>
-                </Col>
-              );
-            })}
+              })}
+            </Masonry>
           </InfiniteScroll>
         </Container>
         <LightBox
