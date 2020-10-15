@@ -5,12 +5,12 @@ import { Card, Button } from 'react-bootstrap';
 
 const LightBox = (props) => {
   const { onNext, onPrev, toggleLightBox, selectedGif, isActive } = props;
+  //react hook for event handling
   React.useEffect(() => {
+    //key down event handler
     const handleKeyDown = (event) => {
-      console.log(event.key);
       switch (event.key) {
         case 'ArrowLeft':
-          console.log('prev');
           onPrev();
           break;
         case 'ArrowRight':
@@ -23,10 +23,11 @@ const LightBox = (props) => {
           break;
       }
     };
+    //event listener implementation
     window.addEventListener('keydown', handleKeyDown);
-
     // cleanup this component
     return () => {
+      //event listener removal
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [onNext, onPrev, toggleLightBox]);
@@ -34,9 +35,11 @@ const LightBox = (props) => {
   if (!selectedGif.images) return null;
   let styles = 'LightBox ';
   styles += isActive ? 'active' : '';
+
   return (
     <Fragment>
       <div className={styles} onClick={toggleLightBox}>
+        {/* lightbox control */}
         <Button
           lbcontrol="true"
           className="lbControl"
@@ -45,11 +48,14 @@ const LightBox = (props) => {
         >
           {'<'}
         </Button>
+        {/* Gif container */}
         <Card>
           <video key={selectedGif.id} lbcontrol="true" autoPlay loop muted>
             <source src={selectedGif.images.original.mp4}></source>
           </video>
         </Card>
+
+        {/* lightbox control */}
         <Button
           lbcontrol="true"
           className="lbControl"

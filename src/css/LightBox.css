@@ -12,7 +12,6 @@
 .LightBox.active {
   display: flex;
   flex-direction: 'row';
-  /* justify-content: center; */
   justify-content: space-between;
   width: 100%;
   align-items: center;
